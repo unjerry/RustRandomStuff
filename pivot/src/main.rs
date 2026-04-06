@@ -20,4 +20,12 @@ pub struct LogEntry {
 
 fn main() {
     println!("Ticklog running...");
+
+    // Example usage to ensure the data structure is functioning
+    let example_entry = LogEntry {
+        timestamp: Utc::now(),
+        ended_tasks: vec!["吃早餐".to_string()],
+        started_tasks: vec!["rust".to_string(), "mmd_tidyup".to_string()],
+    };
+    println!("Current transition: {:?}", example_entry);
 }
