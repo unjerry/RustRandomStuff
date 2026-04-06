@@ -37,6 +37,8 @@ dependencies:
   rust_lib_pivot_ui:
     path: rust_builder
   flutter_rust_bridge: 2.11.1
+  path_provider: ^2.1.5
+  file_picker: ^8.1.2
 
 dev_dependencies:
   flutter_test:
