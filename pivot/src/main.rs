@@ -1,5 +1,6 @@
 use chrono::Utc;
 use pivot::{LogEntry, PivotDb};
+use std::fs;
 fn main() {
     println!("Ticklog running...");
 
@@ -15,4 +16,8 @@ fn main() {
     db.log_transition(vec![], vec!["rust".to_string()]);
     db.log_transition(vec!["rust".to_string()], vec![]);
     db.save();
+    let legdb = PivotDb::load("pivot_data_backup20260411.json".to_string());
+    let str = legdb.convert_to_legacy();
+    println!("{}", str);
+    fs::write("legacy.md", str).ok();
 }

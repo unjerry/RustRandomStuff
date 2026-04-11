@@ -10,10 +10,8 @@ use std::fs; // 📁 Added for file system operations
 pub struct LogEntry {
     /// The exact UTC timestamp of the transition.
     pub timestamp: DateTime<Utc>,
-
     /// A list of tasks that were just completed. Can be empty.
     pub ended_tasks: Vec<String>,
-
     /// A list of tasks that are starting now. Can be empty.
     pub started_tasks: Vec<String>,
 }
@@ -25,7 +23,6 @@ pub struct PivotDb {
     #[serde(skip)] // We don't need to save the path inside the JSON itself
     pub file_path: String,
 }
-
 impl PivotDb {
     pub fn load(path: String) -> Self {
         if let Ok(json_data) = fs::read_to_string(&path) {
@@ -41,7 +38,6 @@ impl PivotDb {
             file_path: path,
         }
     }
-
     pub fn log_transition(&mut self, ended_tasks: Vec<String>, started_tasks: Vec<String>) {
         let entry = LogEntry {
             timestamp: Utc::now(),
@@ -50,10 +46,39 @@ impl PivotDb {
         };
         self.entries.push(entry);
     }
-
     pub fn save(&self) {
         if let Ok(json_data) = serde_json::to_string_pretty(&self.entries) {
             let _ = fs::write(&self.file_path, json_data);
         }
+    }
+    /// Converts the current database entries into a legacy string format.
+    /// The format groups by date and represents transitions as:
+    /// {ended_tasks} -{HHMM}-{started_tasks}
+    pub fn convert_to_legacy(&self) -> String {
+        let mut output = String::new();
+        let mut last_date = String::new();
+
+        let mut sorted_entries = self.entries.clone();
+        sorted_entries.sort_by_key(|e| e.timestamp);
+
+        for entry in sorted_entries {
+            let date_str = entry.timestamp.format("%Y%m%d").to_string();
+            let time_str = entry.timestamp.format("%H%M").to_string();
+
+            if date_str != last_date {
+                if !last_date.is_empty() {
+                    output.push('\n');
+                }
+                output.push_str(&format!("{}\n", date_str));
+                last_date = date_str;
+            }
+
+            let ended = entry.ended_tasks.join("&");
+            let started = entry.started_tasks.join("&");
+
+            // Using a width of 27 for alignment to match the provided legacy style
+            output.push_str(&format!("{:<27} -{}-{}\n", ended, time_str, started));
+        }
+        output
     }
 }
