@@ -7,13 +7,20 @@ environment:
   sdk: ^3.10.7
 
 dependencies:
+  file_picker: ^11.0.2
   flutter:
     sdk: flutter
+  flutter_rust_bridge: 2.11.1
+  path_provider: ^2.1.5
+  rust_lib_pivot_ui:
+    path: rust_builder
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  integration_test:
+    sdk: flutter
 
 flutter:
   uses-material-design: true
