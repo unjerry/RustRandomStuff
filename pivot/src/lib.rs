@@ -6,7 +6,7 @@ use std::fs; // 📁 Added for file system operations
 /// This is the core data structure of the application. Instead of
 /// tracking duration, it logs a "tick" where one or more tasks end,
 /// and one or more tasks begin.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LogEntry {
     /// The exact UTC timestamp of the transition.
     pub timestamp: DateTime<Utc>,
@@ -27,52 +27,33 @@ pub struct PivotDb {
 }
 
 impl PivotDb {
-    /// Creates a new database linked to a specific file path.
-    pub fn new(path: &str) -> Self {
-        PivotDb {
-            entries: Vec::new(),
-            file_path: path.to_string(),
-        }
-    }
-    /// Adds a new log entry to the in-memory list.
-    pub fn add_entry(&mut self, entry: LogEntry) {
-        self.entries.push(entry);
-    }
-
-    /// Saves the current entries to the JSON file.
-    pub fn save(&self) {
-        // Convert the entries list into a nicely formatted JSON string
-        let json_data =
-            serde_json::to_string_pretty(&self.entries).expect("Failed to serialize data");
-
-        // Write the string to the file
-        fs::write(&self.file_path, json_data).expect("Failed to write to file");
-        println!("💾 Database saved to {}", self.file_path);
-    }
-
-    /// Attempts to load an existing database, or creates a new one if the file doesn't exist.
-    pub fn load(path: &str) -> Self {
-        if let Ok(json_data) = fs::read_to_string(path) {
+    pub fn load(path: String) -> Self {
+        if let Ok(json_data) = fs::read_to_string(&path) {
             if let Ok(entries) = serde_json::from_str(&json_data) {
-                println!("📂 Loaded existing database from {}", path);
                 return PivotDb {
                     entries,
-                    file_path: path.to_string(),
+                    file_path: path,
                 };
             }
         }
-
-        println!("✨ Creating new database at {}", path);
-        PivotDb::new(path)
+        PivotDb {
+            entries: Vec::new(),
+            file_path: path,
+        }
     }
-    /// Automatically logs a transition with the current exact time
+
     pub fn log_transition(&mut self, ended_tasks: Vec<String>, started_tasks: Vec<String>) {
         let entry = LogEntry {
-            timestamp: Utc::now(), // Grabs the exact current time ⏱️
+            timestamp: Utc::now(),
             ended_tasks,
             started_tasks,
         };
+        self.entries.push(entry);
+    }
 
-        self.add_entry(entry);
+    pub fn save(&self) {
+        if let Ok(json_data) = serde_json::to_string_pretty(&self.entries) {
+            let _ = fs::write(&self.file_path, json_data);
+        }
     }
 }

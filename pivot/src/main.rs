@@ -11,7 +11,7 @@ fn main() {
     };
     println!("Current transition: {:?}", example_entry);
 
-    let mut db = PivotDb::load("db.json");
+    let mut db = PivotDb::load("db.json".to_string());
     db.log_transition(vec![], vec!["rust".to_string()]);
     db.log_transition(vec!["rust".to_string()], vec![]);
     db.save();
