@@ -124,7 +124,7 @@ class _PivotHomePageState extends State<PivotHomePage> {
                   final bytes = await currentFile.readAsBytes();
 
                   // 3. Ask the OS for a save location
-                  String? savePath = await FilePicker.platform.saveFile(
+                  String? savePath = await FilePicker.saveFile(
                     dialogTitle: 'Save your database backup',
                     fileName: 'pivot_data_backup.json',
                     type: FileType.custom,
