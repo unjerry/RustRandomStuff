@@ -39,8 +39,8 @@ class _PivotHomePageState extends State<PivotHomePage> {
   final TextEditingController _startedController = TextEditingController();
 
   // Add these state lists to hold the generated tags
-  List<String> _endedTasks = [];
-  List<String> _startedTasks = [];
+  final List<String> _endedTasks = [];
+  final List<String> _startedTasks = [];
 
   @override
   Widget build(BuildContext context) {
