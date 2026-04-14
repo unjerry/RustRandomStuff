@@ -1,0 +1,32 @@
+{
+    "o": [
+        {
+            "src": "accounts['merchant-bank']['rental-unit-001']['unit-price']['downpayment']",
+            "dst": "accounts['realestate-company']['rental-unit-001']['assets']",
+            "quant": {
+                "CNY": "100000.00"
+            }
+        },
+        {
+            "src": "accounts['merchant-bank']['rental-unit-001']['unit-price']['remain']",
+            "dst": "accounts['realestate-company']['rental-unit-001']['assets']",
+            "quant": {
+                "CNY": "400000.00"
+            }
+        }
+    ],
+    "i": [
+        {
+            "src": "accounts['realestate-company']['rental-unit-001']['assets']",
+            "dst": "accounts['merchant-bank']['rental-unit-001']['assets']",
+            "quant": {
+                "plex-unit": "1"
+            }
+        }
+    ],
+    "tags": [
+        "purchase",
+        "realestate"
+    ],
+    "demonstration": "buy realestate"
+}

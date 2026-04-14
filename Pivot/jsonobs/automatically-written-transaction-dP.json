@@ -1,0 +1,34 @@
+{
+    "merchant-bank": {
+        "rental-unit-001": [
+            {
+                "name": "creator-subscription",
+                "condition": "AT *-*-15 *:*:*",
+                "action": {
+                    "o": [
+                        {
+                            "src": "accounts['merchant-bank']['patreon-subscription']['creator1']['fee']",
+                            "dst": "accounts['dissipation']['patreon-subscription']['creator1']['fee']",
+                            "quant": {
+                                "USD": "5.00"
+                            }
+                        }
+                    ],
+                    "i": [
+                        {
+                            "src": "accounts['merchant-bank']['patreon-subscription']['creator1']",
+                            "dst": "accounts['dissipation']['patreon-subscription']['creator1']",
+                            "quant": {
+                                "creator1-monthly-membership-Feb": "1"
+                            }
+                        }
+                    ],
+                    "tags": [
+                        "autogen"
+                    ],
+                    "demonstration": "autogen transaction example"
+                }
+            }
+        ]
+    }
+}

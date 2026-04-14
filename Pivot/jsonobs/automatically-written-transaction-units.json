@@ -1,0 +1,16 @@
+{
+    "creator1-monthly-membership-Feb": {
+        "decimal": "0",
+        "explanation": "membership Feburaty with link xxx",
+        "tags": [
+            "membership"
+        ]
+    },
+    "USD": {
+        "decimal": "2",
+        "explanation": "US dollars",
+        "tags": [
+            "Currency"
+        ]
+    }
+}

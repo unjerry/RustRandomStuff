@@ -1,0 +1,23 @@
+{
+    "merchant-bank": {
+        "interests": [
+            {
+                "name": "creator-subscription",
+                "condition": "AT *-*-31 *:*:*",
+                "action": {
+                    "o": [],
+                    "i": [
+                        {
+                            "src": "accounts['merchant-bank-company']['interests']",
+                            "dst": "accounts['merchant-bank']['interests']",
+                            "quant": "(accounts['merchant-bank']['savings']+accounts['merchant-bank']['interests'])*0.0008"
+                        }
+                    ],
+                    "tags": [
+                        "passive"
+                    ]
+                }
+            }
+        ]
+    }
+}

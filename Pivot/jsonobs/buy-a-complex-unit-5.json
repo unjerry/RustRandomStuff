@@ -1,0 +1,16 @@
+{
+    "o": [],
+    "i": [
+        {
+            "src": "accounts['merchant-bank-loan-company']['rental-unit-001']['Mortgage']",
+            "dst": "accounts['merchant-bank']['rental-unit-001']['Mortgage']",
+            "quant": {
+                "CNY": "400000.00"
+            }
+        }
+    ],
+    "tags": [
+        "Mortgage"
+    ],
+    "demonstration": "Mortgage"
+}

@@ -1,0 +1,18 @@
+{
+    "MortgageTicket-1": {
+        "decimal": "0",
+        "explanation": "This is a unit means one bank interest period month",
+        "period": "month",
+        "rate": "0.00625",
+        "tags": [
+            "Liability"
+        ]
+    },
+    "CNY": {
+        "decimal": "2",
+        "explanation": "Chinese On-shore official currency",
+        "tags": [
+            "Currency"
+        ]
+    }
+}

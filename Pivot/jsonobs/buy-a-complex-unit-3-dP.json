@@ -1,0 +1,86 @@
+{
+    "merchant-bank": {
+        "rental-unit-001": [
+            {
+                "name": "Mortgagefee",
+                "condition": "AT *-*-15 *:*:*",
+                "action": {
+                    "o": [
+                        {
+                            "src": "accounts['merchant-bank']['rental-unit-001']['MortgageFee']",
+                            "dst": "accounts['merchant-bank-loan-company']['rental-unit-001']['MortgageFee']",
+                            "quant": "accounts['merchant-bank']['rental-unit-001']['MortgageFee']*0.00125"
+                        }
+                    ],
+                    "i": [],
+                    "tags": [
+                        "Mortgage fee"
+                    ],
+                    "demonstration": "MortgageFee"
+                }
+            },
+            {
+                "name": "MortgageRepayment",
+                "condition": "AT *-*-12 *:*:*",
+                "action": {
+                    "o": [
+                        {
+                            "src": "accounts['merchant-bank']['rental-unit-001']['Mortgage']",
+                            "dst": "accounts['merchant-bank-loan-company']['rental-unit-001']['Mortgage']",
+                            "quant": {
+                                "CNY": "2000.00"
+                            }
+                        }
+                    ],
+                    "i": [],
+                    "tags": [
+                        "repayment"
+                    ],
+                    "demonstration": "repayment Mortgage"
+                }
+            },
+            {
+                "name": "MortgageRepayment",
+                "condition": "AT *-*-13 *:*:* IF ",
+                "action": {
+                    "o": [],
+                    "i": [
+                        {
+                            "src": "accounts['renter']['rental-unit-001']['rentfee']",
+                            "dst": "accounts['merchant-bank']['rental-unit-001']['profit']",
+                            "quant": {
+                                "CNY": "4000.00"
+                            }
+                        }
+                    ],
+                    "tags": [
+                        "passive",
+                        "rentalfee"
+                    ],
+                    "demonstration": "rent fee"
+                }
+            },
+            {
+                "name": "maintainance",
+                "condition": "AT *-*-16 *:*:*",
+                "action": {
+                    "o": [
+                        {
+                            "src": "accounts['merchant-bank']['rental-unit-001']['maintainFee']",
+                            "dst": "accounts['dissipation']['rental-unit-001']['maintainFee']",
+                            "quant": {
+                                "CNY": "300.00"
+                            }
+                        }
+                    ],
+                    "i": [],
+                    "tags": [
+                        "maintain",
+                        "realestate"
+                    ],
+                    "demonstration": "maintain the house"
+                }
+            }
+        ]
+    }
+}

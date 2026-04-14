@@ -1,0 +1,218 @@
+% chapter1-body.tex — pure content, no preamble.
+% This file is \input{} by both main.tex (book) and chapter1.tex (article).
+
+
+
+
+\section{Intro}
+This section explain the concept of "Slice" and "Checkpoint",
+which form the core basis of this ledger system.
+In the condition that the ledger keeping task involved many
+accounts and accounts interactions, it could be hard for a
+unprofessional user to keep everything balanced every tick.\\
+Most time the user would just check certain accounts per time,
+such as a bank account at 2024-12-20 12:32:34, then check the inventory
+of a baggage chest at 2025-01-20 09:34:35, for sake he want to travel.
+And then finnally one day he decided to check all the transaction history,
+he sit down and use a afternoon time to log every single transaction history
+of maybe two accounts among all his accounts. \\
+These asynchronous properties makes we must make a table keep every
+Checkpoint which is the balance value for a certain account with a time
+stamp on it.\\
+Then keep one giant Slice to keep all transaction, this can be
+maintained by any database, SQLish database system or what ever
+system you want to use. Just need to preserve all the information may
+come along one transaction in Slice.
+
+
+\subsection{Slice}
+Some historical background material.
+
+
+\subsection{Checkpoint}
+Discussion of what others have done.
+
+
+
+
+\section{Definitions}
+
+
+\subsection{Q the Quant}
+Quant is the core computable objects this paper will give.
+Only this Quant definitions is forced to preserved,
+while other realization build ontop of that is truly just my
+personal flavour.
+First, let's task a look of several example of the valid json
+representation of quant.
+\inputminted{json}{jsonobs/Q-2.json}
+\inputminted{json}{jsonobs/Q-3.json}
+Use category language we can formalize this to be as follow
+limit union.
+Let the $D$ be the type of Decimal. then
+$$
+    Q_1 = D + Map_{\mathrm{fin}}(String,D)
+$$
+$$
+    Q_2 = D + Map_{\mathrm{fin}}(String,Q_1)
+$$
+And so on.
+$$
+    Q = \bigcup_{n=1}^{\infty} Q_n
+$$
+This is the category definition of our core object Q the
+Quant.
+I'll give some example of the operation.
+
+
+
+
+\section{One Possible Realization}
+To realize all the objects and features that
+defined above not necessarily only one way.\\
+This chapter I will give my own way by
+using rust structures and json representation and
+database.
+
+
+
+
+\section{Demands \& Examples}
+This section contains endless examples one
+will encounter when accounting.\\
+I will demonstrate the case in each subsection,
+analyse it and try to formulate with my structures.
+And by adding more and more cases,
+I hope the model can eventually have some integrity.
+
+
+\subsection{Splitting Accounts}
+For many financial services a state or a company offers
+you, you usually only get one figure for each currency.
+Like \inputminted{json}{jsonobs/spliting-accounts-1.json}
+While some company-oriented bank accounts allow
+multiple sub-accounts for a single currency, these are
+typically fixed accounts for tax and auditing purposes.\\
+However, for personal daily use or modern, complex business
+mechanisms, managing flows and assignments within the same bank
+and same currency is also crucial to keeping everything
+organized and clean.
+For example, a very common personal use case is a
+private piggy bank.
+Like \inputminted{json}{jsonobs/spliting-accounts-2.json}
+% This is currently not in the REGDEL reserve design.
+Regarding the language design, we can simply use JSON syntax:\\
+\texttt{PREFIX["merchant-bank"]["piggybankforlaptop"]["CNY"]} to retrieve \texttt{"50.00"}.
+
+
+\subsection{Money and goods transaction}
+This type of transaction covers a vast number of cases.
+Nearly all double-entry ledger work consists of
+value transfers logged as transactions.\\
+Examples include money-goods transactions, forex transactions,
+or equity capital transactions when incorporating a company.\\
+
+\subsubsection{Forex Exchange}
+This type of exchange often involves
+two type of "goods" which is two type of currency.\\
+For example, CNY and USD.
+Like \inputminted{json}{jsonobs/forex-exchange-1.json}
+For this type of double entry we could simply use this
+json to calculate exchange rate for each exchange,
+or we can filter out every transactions that is certain type.
+
+
+\subsection{CASHFLOW game cases}
+
+\subsubsection{buy a complex unit}
+This involves make a new subaccount,
+and this subaccount is a object contain
+all the organic this business have.
+For example we want to buy a complex unit and rent it
+with downpay and mortgage as following:
+\begin{enumerate}
+    \item house price = 500000.00 CNY
+    \item down payment = 100000.00 CNY
+    \item mortgage = 400000.00 CNY
+    \item monthly rent = 4000.00 CNY
+    \item monthly mortgage payment = 2500.00 CNY
+    \item maintenance = 300.00 CNY
+\end{enumerate}
+this would be some separate transactions.
+First is the mortgage.
+Like \inputminted{json}{jsonobs/buy-a-complex-unit-5.json}
+Then the room purchase,
+Like \inputminted{json}{jsonobs/buy-a-complex-unit-6.json}
+finnally we have a organized subaccount
+\texttt{accounts['merchant-bank']['rental-unit-001']}
+As \inputminted{json}{jsonobs/buy-a-complex-unit-3-P.json}
+We also need to define all the product basis in the unit
+table,
+As \inputminted{json}{jsonobs/buy-a-complex-unit-4.json}
+Then we can derive total state $P$ and total velocities
+$\Delta_t P$ then we can feed this in the auto-update system
+As \inputminted{json}{jsonobs/buy-a-complex-unit-3-dP.json}
+
+
+\subsection{Automatically Written Transactions}
+To improve accounting efficiency, we need automatically
+written transactions. This introduces a new concept:
+inventory and account balances are states in a
+financial space. In different positions, we have different
+velocities; if we describe our current balance Quant
+as $P$, then there will be a $\Delta_t P$ representing
+$\frac{\text{Quant}}{\text{time}}$.
+This is an overall summation where we have $P$
+and $\Delta_t P$. Every cashflow is a small contribution to
+$\Delta_t P$, such that $\Delta_t P=\sum_{i}\Delta_t P_i$.
+These small transactions are $\Delta_t P \cdot \Delta t = \Delta P$, which constitutes
+a Slice; at any given moment, we have accounts and inventory
+represented by $P_t$.
+The Newton-Leibniz formula applies here:
+$P_t + \sum_{i=t}^{T} \Delta P_i = P_T$.
+
+\subsubsection{Subscription}
+This case arises from my personal accounting needs.
+I usually subscribe to creators for their work and
+services on Patreon or other patron platforms.
+These subscriptions create periodic, automatic
+transactions.
+Like \inputminted{json}{jsonobs/automatically-written-transaction-1.json}
+with a new tag called "autogen" or whatever the user prefers.
+This feature should be part of a program.\\
+A clock measures the time period and
+triggers this function when needed.
+along with few more table as following.
+Like \inputminted{json}{jsonobs/automatically-written-transaction-P.json}
+Like \inputminted{json}{jsonobs/automatically-written-transaction-dP.json}
+Like \inputminted{json}{jsonobs/automatically-written-transaction-units.json}
+
+\subsubsection{Interests}
+Money deposited somewhere has its own value;
+just as humans sell their time to build others'
+dreams and get paid, money's time also has the ability to
+build others' dreams. Therefore, money's time is valuable.\\
+Interests, as passive income,
+are a time-money exchange just like active income.
+They might have the following format:
+Like \inputminted{json}{jsonobs/interests-1.json}
+Note that the "passive" tag might not be necessary because
+when any account has a time quantity as an output, it is passive—except
+for the account representing the user themselves, in which case it is
+a special passive income known as active income. This
+redundancy only works if the user has well-defined the quantity explanation
+config file, which might look as follows for this case:
+Like \inputminted{json}{jsonobs/interests-units.json}
+Like \inputminted{json}{jsonobs/interests-P.json}
+Like \inputminted{json}{jsonobs/interests-dP.json}
+If an explanation exists, we can perform selections based on it
+by setting search conditions in the database
+which are identical to searching for the "passive" tag.
+The search is as follows:\\
+\texttt{SELECT i(*,*,*) o(*,*,HAS TYPE "Time") (tags)}\\
+For a proper set sytem this would equal the following\\
+\texttt{SELECT i(*,*,*) o(*,*,*) (HAS "passive")}
+
+
+
+

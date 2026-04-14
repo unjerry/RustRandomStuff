@@ -1,0 +1,24 @@
+{
+    "o": [
+        {
+            "src": "merchant-bank",
+            "dst": "exchange-center",
+            "quant": {
+                "CNY": "73.50"
+            }
+        }
+    ],
+    "i": [
+        {
+            "src": "exchange-center",
+            "dst": "merchant-bank",
+            "quant": {
+                "USD": "10.00"
+            }
+        }
+    ],
+    "tags": [
+        "exchange"
+    ],
+    "demonstration": "forex exchange examples"
+}

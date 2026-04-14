@@ -1,0 +1,12 @@
+{
+    "merchant-bank": {
+        "CNY": "23.43",
+        "USD": "34.23",
+        "piggybankforlaptop": {
+            "CNY": "50.00"
+        },
+        "piggybankforStudyabroad": {
+            "CNY": "50.00"
+        }
+    }
+}

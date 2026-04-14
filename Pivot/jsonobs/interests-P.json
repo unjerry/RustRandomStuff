@@ -1,0 +1,15 @@
+{
+    "merchant-bank": {
+        "zhaozhaobao": {
+            "CNY": "123456.00"
+        },
+        "interests": {
+            "CNY": "12.34"
+        }
+    },
+    "merchant-bank-company": {
+        "interests": {
+            "CNY": "-12.34"
+        }
+    }
+}

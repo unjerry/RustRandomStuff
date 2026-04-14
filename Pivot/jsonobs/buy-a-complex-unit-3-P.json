@@ -1,0 +1,49 @@
+{
+    "merchant-bank": {
+        "rental-unit-001": {
+            "unit-price": {
+                "downpayment": {
+                    "CNY": "-100000.00"
+                },
+                "remain": {
+                    "CNY": "-400000.00"
+                }
+            },
+            "assets": {
+                "plex-unit": "1"
+            },
+            "profit": {},
+            "MortgageFee": {},
+            "maintainFee": {},
+            "Mortgage": {
+                "CNY": "400000.00"
+            }
+        }
+    },
+    "merchant-bank-loan-company": {
+        "rental-unit-001": {
+            "MortgageFee": {},
+            "Mortgage": {
+                "CNY": "-400000.00"
+            }
+        }
+    },
+    "realestate-company": {
+        "rental-unit-001": {
+            "assets": {
+                "plex-unit": "-1",
+                "CNY": "500000.00"
+            }
+        }
+    },
+    "renter": {
+        "rental-unit-001": {
+            "rentfee": {}
+        }
+    },
+    "dissipation": {
+        "rental-unit-001": {
+            "maintainFee": {}
+        }
+    }
+}

@@ -1,0 +1,9 @@
+{
+    "CNY": {
+        "decimal": "2",
+        "explanation": "Chinese On-shore official currency",
+        "tags": [
+            "Currency"
+        ]
+    }
+}

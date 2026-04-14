@@ -1,0 +1,26 @@
+{
+    "merchant-bank": {
+        "patreon-subscription": {
+            "creator1": {
+                "fee": {
+                    "USD": "-5.00"
+                },
+                "equity": {
+                    "creator1-monthly-membership-Feb": "1"
+                }
+            }
+        }
+    },
+    "dissipation": {
+        "patreon-subscription": {
+            "creator1": {
+                "fee": {
+                    "USD": "5.00"
+                },
+                "equity": {
+                    "creator1-monthly-membership-Feb": "-1"
+                }
+            }
+        }
+    }
+}

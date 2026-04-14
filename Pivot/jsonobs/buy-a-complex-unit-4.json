@@ -1,0 +1,16 @@
+{
+    "plex-unit": {
+        "decimal": "0",
+        "explanation": "plex unit housing",
+        "tags": [
+            "Realestate"
+        ]
+    },
+    "CNY": {
+        "decimal": "2",
+        "explanation": "Chinese On-shore official currency",
+        "tags": [
+            "Currency"
+        ]
+    }
+}

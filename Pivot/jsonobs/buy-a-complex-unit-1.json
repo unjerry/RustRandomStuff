@@ -1,0 +1,17 @@
+{
+    "o": {
+        "src": "accounts['merchant-bank']['aplex-1']",
+        "dst": "merchant-bank-loan",
+        "quant": {
+            "MortgageTicket-1": "400000.00"
+        }
+    },
+    "i": {
+        "src": "merchant-bank-loan",
+        "dst": "accounts['merchant-bank']['aplex-1']",
+        "quant": {
+            "CNY": "400000.00"
+        }
+    },
+    "tags": []
+}
