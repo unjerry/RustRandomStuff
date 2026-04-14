@@ -35,8 +35,12 @@ class PivotHomePage extends StatefulWidget {
 }
 
 class _PivotHomePageState extends State<PivotHomePage> {
-  final _endedController = TextEditingController();
-  final _startedController = TextEditingController();
+  final TextEditingController _endedController = TextEditingController();
+  final TextEditingController _startedController = TextEditingController();
+
+  // Add these state lists to hold the generated tags
+  List<String> _endedTasks = [];
+  List<String> _startedTasks = [];
 
   @override
   Widget build(BuildContext context) {
@@ -50,32 +54,62 @@ class _PivotHomePageState extends State<PivotHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TextField(
+            // --- ENDED TASKS TAG INPUT ---
+            _buildTagInput(
+              label: 'Ended Tasks (e.g. 吃早餐) - Press Enter',
               controller: _endedController,
-              decoration: const InputDecoration(
-                labelText: 'Ended Tasks (e.g. 吃早餐)',
-                border: OutlineInputBorder(),
-              ),
+              tags: _endedTasks,
+              onTagAdded: (value) {
+                setState(() {
+                  _endedTasks.add(value);
+                });
+              },
+              onTagDeleted: (tag) {
+                setState(() {
+                  _endedTasks.remove(tag);
+                });
+              },
             ),
+
             const SizedBox(height: 16),
-            TextField(
+
+            // --- STARTED TASKS TAG INPUT ---
+            _buildTagInput(
+              label: 'Started Tasks (e.g. rust) - Press Enter',
               controller: _startedController,
-              decoration: const InputDecoration(
-                labelText: 'Started Tasks (e.g. rust)',
-                border: OutlineInputBorder(),
-              ),
+              tags: _startedTasks,
+              onTagAdded: (value) {
+                setState(() {
+                  _startedTasks.add(value);
+                });
+              },
+              onTagDeleted: (tag) {
+                setState(() {
+                  _startedTasks.remove(tag);
+                });
+              },
             ),
+
             const SizedBox(height: 24),
+
             ElevatedButton.icon(
               onPressed: () async {
+                // Check if there's leftover text in the input that wasn't submitted
+                if (_endedController.text.trim().isNotEmpty) {
+                  _endedTasks.add(_endedController.text.trim());
+                }
+                if (_startedController.text.trim().isNotEmpty) {
+                  _startedTasks.add(_startedController.text.trim());
+                }
+
                 // 1. Get the safe folder for your app database
                 final directory = await getApplicationDocumentsDirectory();
                 final dbPath = '${directory.path}/pivot_data.json';
                 print(dbPath);
 
-                // 2. Put the text into lists (since Rust expects Vec<String>)
-                final endedList = [_endedController.text];
-                final startedList = [_startedController.text];
+                // 2. Use the lists directly! (They are already List<String>)
+                final endedList = List<String>.from(_endedTasks);
+                final startedList = List<String>.from(_startedTasks);
 
                 // 3. Load the database from the safe mobile path
                 var db = await PivotDb.load(path: dbPath);
@@ -98,8 +132,13 @@ class _PivotHomePageState extends State<PivotHomePage> {
                   );
                 }
 
-                _endedController.clear();
-                _startedController.clear();
+                // Clear the UI state after successful save
+                setState(() {
+                  _endedTasks.clear();
+                  _startedTasks.clear();
+                  _endedController.clear();
+                  _startedController.clear();
+                });
               },
               icon: const Icon(Icons.add_task),
               label: const Text('Log Tick'),
@@ -165,6 +204,49 @@ class _PivotHomePageState extends State<PivotHomePage> {
           ],
         ),
       ),
+    );
+  }
+
+  // Helper method to build the YouTube-style tag input
+  Widget _buildTagInput({
+    required String label,
+    required TextEditingController controller,
+    required List<String> tags,
+    required Function(String) onTagAdded,
+    required Function(String) onTagDeleted,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // The Wrap widget displays the chips and wraps to the next line automatically
+        Wrap(
+          spacing: 8.0, // horizontal gap between chips
+          runSpacing: 4.0, // vertical gap between lines of chips
+          children: tags.map((tag) {
+            return Chip(
+              label: Text(tag),
+              deleteIcon: const Icon(Icons.cancel, size: 18),
+              onDeleted: () =>
+                  onTagDeleted(tag), // Removes the tag when the X is clicked
+            );
+          }).toList(),
+        ),
+        if (tags.isNotEmpty) const SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: label,
+            border: const OutlineInputBorder(),
+          ),
+          onSubmitted: (value) {
+            // Triggered when the user presses Enter on the keyboard
+            if (value.trim().isNotEmpty) {
+              onTagAdded(value.trim());
+              controller.clear();
+            }
+          },
+        ),
+      ],
     );
   }
 }
