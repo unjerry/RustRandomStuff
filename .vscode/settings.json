@@ -1,0 +1,5 @@
+{
+    "rust-analyzer.linkedProjects": [
+        "wksp/Pivot-dev/pivot/Cargo.toml",
+    ],
+}
