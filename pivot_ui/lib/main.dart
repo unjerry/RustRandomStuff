@@ -4,6 +4,7 @@ import 'package:pivot_ui/src/rust/api/simple.dart';
 import 'dart:io'; // Gives us the File tool to copy data
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   // This turns on the bridge before the app starts drawing the screen
@@ -94,7 +95,6 @@ class _PivotHomePageState extends State<PivotHomePage> {
 
             ElevatedButton.icon(
               onPressed: () async {
-                // Check if there's leftover text in the input that wasn't submitted
                 if (_endedController.text.trim().isNotEmpty) {
                   _endedTasks.add(_endedController.text.trim());
                 }
@@ -102,37 +102,36 @@ class _PivotHomePageState extends State<PivotHomePage> {
                   _startedTasks.add(_startedController.text.trim());
                 }
 
-                // 1. Get the safe folder for your app database
-                final directory = await getApplicationDocumentsDirectory();
-                final dbPath = '${directory.path}/pivot_data.json';
-                print(dbPath);
-
-                // 2. Use the lists directly! (They are already List<String>)
                 final endedList = List<String>.from(_endedTasks);
                 final startedList = List<String>.from(_startedTasks);
 
-                // 3. Load the database from the safe mobile path
-                var db = await PivotDb.load(path: dbPath);
+                // 1. Flutter gets the saved JSON string (Web/Mobile safe!)
+                final prefs = await SharedPreferences.getInstance();
+                final savedJson = prefs.getString('pivot_database') ?? '';
 
-                // 4. Send the tasks across the bridge! 🌉
+                // 2. We initialize Rust from the string, not a file path!
+                var db = await PivotDb.fromJson(jsonData: savedJson);
+
+                // 3. Rust does the logic
                 await db.logTransition(
                   endedTasks: endedList,
                   startedTasks: startedList,
                 );
 
-                // 5. Tell Rust to save the changes to the JSON file
-                await db.save();
+                // 4. Rust gives the updated JSON string back to Flutter
+                final newJson = await db.toJson();
 
-                // Show a quick pop-up message on the screen to confirm
+                // 5. Flutter saves it back to the browser/device storage!
+                await prefs.setString('pivot_database', newJson);
+
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Tick saved to Rust backend! 💾'),
+                      content: Text('Tick saved cross-platform! 💾🌐'),
                     ),
                   );
                 }
 
-                // Clear the UI state after successful save
                 setState(() {
                   _endedTasks.clear();
                   _startedTasks.clear();

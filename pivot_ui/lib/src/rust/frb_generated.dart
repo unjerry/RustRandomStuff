@@ -64,7 +64,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => 336411057;
+  int get rustContentHash => 1123920769;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -93,6 +93,8 @@ abstract class RustLibApi extends BaseApi {
 
   Future<String> crateApiSimplePivotDbConvertToLegacy({required PivotDb that});
 
+  Future<PivotDb> crateApiSimplePivotDbFromJson({required String jsonData});
+
   Future<PivotDb> crateApiSimplePivotDbLoad({required String path});
 
   Future<void> crateApiSimplePivotDbLogTransition({
@@ -102,6 +104,8 @@ abstract class RustLibApi extends BaseApi {
   });
 
   Future<void> crateApiSimplePivotDbSave({required PivotDb that});
+
+  Future<String> crateApiSimplePivotDbToJson({required PivotDb that});
 
   RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_PivotDb;
 
@@ -279,6 +283,38 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<PivotDb> crateApiSimplePivotDbFromJson({required String jsonData}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(jsonData, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 6,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPivotDb,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiSimplePivotDbFromJsonConstMeta,
+        argValues: [jsonData],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSimplePivotDbFromJsonConstMeta =>
+      const TaskConstMeta(
+        debugName: "PivotDb_from_json",
+        argNames: ["jsonData"],
+      );
+
+  @override
   Future<PivotDb> crateApiSimplePivotDbLoad({required String path}) {
     return handler.executeNormal(
       NormalTask(
@@ -288,7 +324,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 6,
+            funcId: 7,
             port: port_,
           );
         },
@@ -326,7 +362,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 7,
+            funcId: 8,
             port: port_,
           );
         },
@@ -360,7 +396,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 8,
+            funcId: 9,
             port: port_,
           );
         },
@@ -377,6 +413,37 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   TaskConstMeta get kCrateApiSimplePivotDbSaveConstMeta =>
       const TaskConstMeta(debugName: "PivotDb_save", argNames: ["that"]);
+
+  @override
+  Future<String> crateApiSimplePivotDbToJson({required PivotDb that}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPivotDb(
+            that,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 10,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_String,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiSimplePivotDbToJsonConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSimplePivotDbToJsonConstMeta =>
+      const TaskConstMeta(debugName: "PivotDb_to_json", argNames: ["that"]);
 
   RustArcIncrementStrongCountFnType
   get rust_arc_increment_strong_count_PivotDb => wire
@@ -826,4 +893,7 @@ class PivotDbImpl extends RustOpaque implements PivotDb {
 
   Future<void> save() =>
       RustLib.instance.api.crateApiSimplePivotDbSave(that: this);
+
+  Future<String> toJson() =>
+      RustLib.instance.api.crateApiSimplePivotDbToJson(that: this);
 }

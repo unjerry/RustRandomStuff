@@ -14,6 +14,7 @@ dependencies:
   path_provider: ^2.1.5
   rust_lib_pivot_ui:
     path: rust_builder
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:

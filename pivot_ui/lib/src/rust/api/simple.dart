@@ -23,6 +23,9 @@ abstract class PivotDb implements RustOpaqueInterface {
   /// {ended_tasks} -{HHMM}-{started_tasks}
   Future<String> convertToLegacy();
 
+  static Future<PivotDb> fromJson({required String jsonData}) =>
+      RustLib.instance.api.crateApiSimplePivotDbFromJson(jsonData: jsonData);
+
   static Future<PivotDb> load({required String path}) =>
       RustLib.instance.api.crateApiSimplePivotDbLoad(path: path);
 
@@ -32,6 +35,8 @@ abstract class PivotDb implements RustOpaqueInterface {
   });
 
   Future<void> save();
+
+  Future<String> toJson();
 }
 
 /// Represents a single moment in time when tasks transition.

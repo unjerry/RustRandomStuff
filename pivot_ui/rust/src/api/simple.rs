@@ -40,6 +40,28 @@ impl PivotDb {
             file_path: path,
         }
     }
+    // ... inside impl PivotDb { ...
+
+    // 🌐 NEW: Web-safe loader (Flutter gives Rust the string)
+    pub fn from_json(json_data: String) -> Self {
+        if let Ok(entries) = serde_json::from_str(&json_data) {
+            return PivotDb {
+                entries,
+                file_path: String::new(), // We don't need paths on the web!
+            };
+        }
+        PivotDb {
+            entries: Vec::new(),
+            file_path: String::new(),
+        }
+    }
+
+    // 🌐 NEW: Web-safe saver (Rust gives Flutter the string)
+    pub fn to_json(&self) -> String {
+        serde_json::to_string_pretty(&self.entries).unwrap_or_default()
+    }
+
+    // ... your existing log_transition and save functions continue here ...
     pub fn log_transition(&mut self, ended_tasks: Vec<String>, started_tasks: Vec<String>) {
         let entry = LogEntry {
             timestamp: Utc::now(),
