@@ -1,0 +1,10 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/game_app",
+    "crates/game_core",
+    "crates/game_platform",
+    "crates/game_render",
+    "crates/game_ui",
+]
+

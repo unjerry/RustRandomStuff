@@ -1,0 +1,9 @@
+[package]
+name = "nodes_render"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+nodes_core = { path = "../game_core" }
+
