@@ -14,4 +14,3 @@ impl Renderer {
         // WGPU frame encoding will live here.
     }
 }
-

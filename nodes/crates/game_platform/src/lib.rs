@@ -22,4 +22,3 @@ impl AssetError {
         &self.message
     }
 }
-

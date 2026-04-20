@@ -2,6 +2,13 @@
 
 use nodes_core::GameCore;
 
+mod node_view;
+
+pub use node_view::{
+    show_node_editor, NodeGraphEditor, NodeInstanceId, NodeRenderPlan, Point, PortRenderPlan,
+    PropertyRenderPlan, Size, TextAlign,
+};
+
 #[derive(Debug, Default)]
 pub struct UiState;
 
@@ -14,4 +21,3 @@ impl UiState {
         // UI model sync will live here.
     }
 }
-

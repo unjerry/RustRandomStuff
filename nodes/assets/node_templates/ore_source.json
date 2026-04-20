@@ -1,0 +1,68 @@
+{
+  "id": "ore_source",
+  "title": "Ore Source",
+  "subtitle": "Basic extractor",
+  "description": "Creates raw ore and exposes it as a graph output.",
+  "size": {
+    "width": 260,
+    "header_height": 38,
+    "row_height": 30,
+    "padding": 12,
+    "port_radius": 6
+  },
+  "style": {
+    "header_color": "#2A5C43",
+    "body_color": "#171C1A",
+    "border_color": "#6A8275",
+    "text_color": "#EEF3EF",
+    "item_port_color": "#7BCB84",
+    "energy_port_color": "#E5B84E",
+    "signal_port_color": "#70A7DF"
+  },
+  "ports": [
+    {
+      "id": "power_in",
+      "label": "Power",
+      "direction": "input",
+      "kind": "energy",
+      "capacity_per_tick": 2
+    },
+    {
+      "id": "ore_in",
+      "label": "Ore In",
+      "direction": "input",
+      "kind": "item",
+      "item": "ore",
+      "capacity_per_tick": 1
+    },
+    {
+      "id": "ore_out",
+      "label": "Ore",
+      "direction": "output",
+      "kind": "item",
+      "item": "ore",
+      "capacity_per_tick": 1
+    },
+    {
+      "id": "stone_out",
+      "label": "Stone",
+      "direction": "output",
+      "kind": "item",
+      "item": "stone",
+      "capacity_per_tick": 1
+    }
+  ],
+  "properties": [
+    {
+      "id": "rate",
+      "label": "Rate",
+      "value": 1,
+      "unit": "ore/tick"
+    },
+    {
+      "id": "enabled",
+      "label": "Enabled",
+      "value": true
+    }
+  ]
+}

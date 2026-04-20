@@ -5,8 +5,12 @@ edition = "2021"
 publish = false
 
 [dependencies]
+egui = "0.31.1"
+egui-wgpu = { version = "0.31.1", features = ["winit", "wayland", "x11"] }
+egui-winit = "0.31.1"
 nodes_core = { path = "../game_core" }
 nodes_platform = { path = "../game_platform" }
 nodes_render = { path = "../game_render" }
 nodes_ui = { path = "../game_ui" }
-
+pollster = "0.4"
+winit = { version = "0.30.12", features = ["wayland", "x11"] }
