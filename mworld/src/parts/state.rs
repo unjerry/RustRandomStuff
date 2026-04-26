@@ -1,35 +1,14 @@
+use crate::parts::{
+    camera::CameraUniform,
+    pipeline::{create_camera_bind_group_layout, create_render_pipeline},
+    vertex::Vertex,
+};
 use std::sync::Arc;
-
 use wgpu::util::DeviceExt;
 use winit::window::Window;
 
-use crate::parts::vertex::Vertex;
-
-const SHADER_SOURCE: &str = "
-struct VertexInput {
-    @location(0) position: vec3<f32>,
-    @location(1) color: vec3<f32>,
-};
-
-struct VertexOutput {
-    @builtin(position) clip_position: vec4<f32>,
-    @location(0) color: vec3<f32>,
-};
-
-@vertex
-fn vs_main(model: VertexInput) -> VertexOutput {
-    var out: VertexOutput;
-    out.color = model.color;
-    // 目前我们直接输出位置，之后相机矩阵会在这里发挥作用
-    out.clip_position = vec4<f32>(model.position, 1.0);
-    return out;
-}
-
-@fragment
-fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
-    return vec4<f32>(in.color, 1.0);
-}
-";
+const SHADER_SOURCE: &str = include_str!("shader.wgsl");
+// const SHADER_SOURCE: &str = "";
 // 2. 定义四个顶点数据（逆时针顺序：左上，左下，右下，右上）
 const VERTICES: &[Vertex] = &[
     // NDC 坐标 (-1, 1, -1, 1)，留边 0.9
@@ -68,6 +47,9 @@ pub struct State {
     index_buffer: wgpu::Buffer,
     num_indices: u32, // 记录有多少个索引需要画
     render_pipeline: wgpu::RenderPipeline,
+    // --- 新增 ---
+    camera_buffer: wgpu::Buffer,
+    camera_bind_group: wgpu::BindGroup,
 }
 impl State {
     pub async fn new(window: Arc<Window>) -> Self {
@@ -147,54 +129,40 @@ impl State {
             label: Some("Shader"),
             source: wgpu::ShaderSource::Wgsl(SHADER_SOURCE.into()),
         });
-        let render_pipeline_layout =
-            device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-                label: Some("Render Pipeline Layout"),
-                bind_group_layouts: &[], // 目前还没有外部资源
-                immediate_size: 0,
-            });
-        let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-            label: Some("Render Pipeline"),
-            layout: Some(&render_pipeline_layout),
-            vertex: wgpu::VertexState {
-                module: &shader,
-                entry_point: Some("vs_main"), // 对应 WGSL 里的 @vertex 函数名
-                buffers: &[Vertex::desc()],   // 传入顶点布局说明书
-                compilation_options: Default::default(),
-            },
-            fragment: Some(wgpu::FragmentState {
-                module: &shader,
-                entry_point: Some("fs_main"), // 对应 WGSL 里的 @fragment 函数名
-                targets: &[Some(wgpu::ColorTargetState {
-                    format: config.format,
-                    blend: Some(wgpu::BlendState::REPLACE), // 直接覆盖背景色
-                    write_mask: wgpu::ColorWrites::ALL,
-                })],
-                compilation_options: Default::default(),
-            }),
-            primitive: wgpu::PrimitiveState {
-                topology: wgpu::PrimitiveTopology::TriangleList, // 我们要画三角形
-                strip_index_format: None,
-                front_face: wgpu::FrontFace::Ccw,  // 逆时针为正面
-                cull_mode: Some(wgpu::Face::Back), // 剔除背面
-                ..Default::default()
-            },
-            depth_stencil: None, // 目前不使用深度测试
-            multisample: wgpu::MultisampleState::default(),
-            multiview_mask: None,
-            cache: None,
+        // 1. 初始化相机数据
+        let camera_uniform = CameraUniform::new(config.width, config.height);
+        // 2. 创建 Camera Buffer
+        let camera_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("Camera Buffer"),
+            contents: bytemuck::cast_slice(&[camera_uniform]),
+            usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
         });
+
+        let camera_bind_group_layout = create_camera_bind_group_layout(&device);
+
+        let camera_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+            layout: &camera_bind_group_layout,
+            entries: &[wgpu::BindGroupEntry {
+                binding: 0,
+                resource: camera_buffer.as_entire_binding(),
+            }],
+            label: Some("camera_bind_group"),
+        });
+
+        let render_pipeline =
+            create_render_pipeline(&device, &config, &shader, &camera_bind_group_layout);
         Self {
             surface,
             device,
             queue,
             config,
             size,
-            // --- 填充新增字段 ---
             vertex_buffer,
             index_buffer,
             num_indices,
             render_pipeline,
+            camera_buffer,
+            camera_bind_group,
         }
     }
     // 1. 处理窗口缩放
@@ -205,6 +173,15 @@ impl State {
             self.config.height = new_size.height;
             // 关键：重新配置 Surface
             self.surface.configure(&self.device, &self.config);
+            let aspect = self.config.width as f32 / self.config.height as f32;
+
+            let camera_uniform = CameraUniform::new(self.config.width, self.config.height);
+
+            self.queue.write_buffer(
+                &self.camera_buffer,
+                0,
+                bytemuck::cast_slice(&[camera_uniform]),
+            );
         }
     } // 2. 渲染函数
     // 我们先用一个通用的 Result，避免找不到 SurfaceError 的问题
@@ -253,15 +230,19 @@ impl State {
                 ..Default::default() // 或者手动补齐
             });
 
-            // 2. 既然我们手里有了 render_pass 这支笔，就可以开始画画了
-            render_pass.set_pipeline(&self.render_pipeline); // 设置刚才创建的管线
-            render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..)); // 绑定顶点数据
-            render_pass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16); // 绑定索引
+            // 1. 设置管线
+            render_pass.set_pipeline(&self.render_pipeline);
 
-            // 3. 下达最后的开火命令！
+            // 2. 绑定相机（戴上眼镜）
+            // 对应 Shader 里的 @group(0) @binding(0)
+            render_pass.set_bind_group(0, &self.camera_bind_group, &[]);
+
+            // 3. 绑定顶点和索引（准备画布）
+            render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
+            render_pass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
+
+            // 4. 下达指令（只画一次就够了）
             render_pass.draw_indexed(0..self.num_indices, 0, 0..1);
-
-            // 注意：当 render_pass 离开这个大括号作用域时，录制就自动结束了            });
         }
 
         self.queue.submit(std::iter::once(encoder.finish()));
